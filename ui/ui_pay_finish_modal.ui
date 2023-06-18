@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Modal_finish</class>
+ <widget class="QWidget" name="Modal_finish">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>540</width>
+    <height>960</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">*{
+	font: 28pt &quot;배달의민족 도현&quot;;
+	color: #292929;
+}
+#widget_main{
+	background-color: #ffffff;
+}
+
+QScrollArea {
+	background: transparent;
+	border-style: none;
+}
+
+QScrollArea * {
+	background: transparent;
+}
+
+QScrollBar:vertical {
+        background: #white;
+        width:20px;
+		margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:vertical {
+    border-width: 2px;
+	border-style: solid;
+	border-radius : 10px;
+    border-color: #a3a3a3;
+	background-color : #ffffff;
+
+}
+
+QScrollBar::sub-line:vertical {
+    border-width:2px;
+	border-style: solid;
+	border-radius : 10px;
+    border-color: #a3a3a3;
+	background-color: white;
+}
+QScrollBar::sub-line:vertical:pressed {
+	background-color: #a3a3a3;
+}
+
+QScrollBar::add-line:vertical {
+    border-width: 2px;
+	border-style: solid;
+	border-radius : 10px;
+    border-color: #a3a3a3;
+	background-color: white;
+}
+QScrollBar::add-line:vertical:pressed {
+	background-color: #a3a3a3;
+}
+
+
+QPushButton {
+	background-color : #ffffff;
+	border-width: 1px;
+	border-style: solid;
+	border-radius : 5px;
+	border-color: #a3a3a3;
+}
+
+QPushButton:Pressed {
+	background-color : #eeeeee;
+}
+
+#btn_add_basket_count,
+#label_info,
+#banner_1,
+#banner_2,
+#banner_3,
+#banner_4
+{
+	background-color: #ffbc0d;
+}
+
+#banner_5{
+	background-color: #dcdcdc;
+}
+
+#banner_1_inner,
+#banner_2_inner,
+#banner_3_inner,
+#banner_4_inner
+{
+	background-color: white;
+}
+
+#widget_left, #widget_right{
+	border-style: solid;
+	border-color: #a3a3a3;
+	border-width: 2px;
+	border-radius: 5px;
+}
+
+#frame_big_item_stapper, #pay_way_1, #pay_way_2{
+	border-style: solid;
+	border-color: #a3a3a3;
+	border-width: 1px;
+	border-radius: 5px;
+}
+
+
+#label_menu_name {
+	font: 16pt;
+}
+
+#label_ask_set {
+	font: 24pt;
+}
+
+#label_info_set, #label_info_single{
+	font: 14pt;
+}
+
+#btn_cancel {
+	font: 14pt;
+}
+
+#label_ask_pay_way, #label_ask_pay_way_2{
+	font: 26pt;
+}
+
+#label_item_count {
+	border-width : 1px;
+	border-style: solid;
+	border-color: #eeeeee;
+	font: 12pt;
+}
+#btn_plus, #btn_minus{
+	font: 18pt;
+}
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="widget_main" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QWidget" name="widget_body_main_3" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>240</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_2" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_logo">
+              <property name="minimumSize">
+               <size>
+                <width>250</width>
+                <height>250</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>250</width>
+                <height>250</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>../src/logo.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>감사합니다</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

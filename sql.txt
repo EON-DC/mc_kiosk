@@ -1,0 +1,30 @@
+create table Coupon(
+	ID integer primary key,
+	Code text not null,
+	Name text not null,
+	Discount real not null,
+	RestuarantID int,
+	IsRelativeDiscount int not null,
+	MaximumUse int);
+
+create table Restaurant(
+	ID integer primary key,
+	Name text not null,
+	ShortDescription text not null,
+	Description text not null,
+	CurrentMenuID integer,
+	Image integer,
+	IsActive not null);
+
+create table WeekDay(
+	ID integer primary key,
+	name text);
+
+create table OpeningHours(
+	ID integer primary key,
+	RestaurantID int not null,
+	Day integer not null,
+	FromHour integer not null,
+	FromMinute integer not null,
+	ToHour integer not null,
+	ToMinute integer not null);
