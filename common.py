@@ -20,6 +20,8 @@ tb_menu_detail_col_name = ['menu_detail_id', 'description', 'weight', 'volume', 
 tb_order_col_name = ['order_id', 'order_date', 'location_id', 'order_status_id',
                      'qr_code_id', 'order_number', 'total_price']
 
+yellow = '#ffbc0d'
+
 
 def is_morning(input_datetime=None):
     if input_datetime is None:

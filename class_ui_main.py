@@ -1,12 +1,14 @@
 import datetime
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
 
 import common
 from class_basket import Basket
 from class_controller import KioskController
-from class_ui_modal import ModalFinish
+from class_ui_modal import ModalFinish, ListConfirmItem
 from ui_kiosk import Ui_MainWidget
 from class_carusel import Carusel
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -25,9 +27,10 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self._set_standby_initial()
         self.ad_timer = self._init_timer()
         self.banners = self._get_banners()
+        self.qmovie_card_insert_gif = None
         self._adjustment_style_detail()
         self.menu_img_dict = self._set_pixmap_list()
-        self.menu_carusel_dict = self._set_carusel_dict()
+        # self.menu_carusel_dict = self._set_carusel_dict()
         self._set_btn_triggered()
         self.yellow_under_lines = self._get_yellow_underlines()
         self._banner_click_event(0)  # 주문하기 버튼이 눌렸을 때 홈화면으로 셋팅되게함
@@ -36,22 +39,29 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.widget_carusel_menu_list = self._grouping_carusel_widget()
         self._initialize_select_menu_page_carusel()
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        self.burger_carusel_list, self.coffee_carusel_list = self._set_burger_and_coffee_carusel_list()
-        modal = ModalFinish()
-        modal.show()
+        # self.burger_carusel_list, self.coffee_carusel_list = self._set_burger_and_coffee_carusel_list()
+        self._reset_gui_and_attributes_before_get_orders()
 
-    def _set_burger_and_coffee_carusel_list(self):
-        burger_list = list()
-        coffee_list = list()
+    def _reset_gui_and_attributes_before_get_orders(self):
+        self.btn_confirm_order.setStyleSheet(f"background-color:white")
 
-        for carusel in self.menu_carusel_dict.values():
-            carusel: Carusel
-            if carusel.menu_info.classification_id == 1:
-                burger_list.append(carusel)
-            elif carusel.menu_info.classification_id == 5:
-                coffee_list.append(carusel)
+        self.stackedWidget_carusel_menu_burger.setCurrentIndex(0)
+        self.stackedWidget_carusel_menu_coffee.setCurrentIndex(0)
 
-        return burger_list, coffee_list
+        self._refresh_cart_count_and_total_price()
+
+    # def _set_burger_and_coffee_carusel_list(self):
+    #     burger_list = list()
+    #     coffee_list = list()
+    #
+    #     for carusel in self.menu_carusel_dict.values():
+    #         carusel: Carusel
+    #         if carusel.menu_info.classification_id == 1:
+    #             burger_list.append(carusel)
+    #         elif carusel.menu_info.classification_id == 5:
+    #             coffee_list.append(carusel)
+    #
+    #     return burger_list, coffee_list
 
     # 배너 그룹핑
     def _get_banners(self):
@@ -100,29 +110,45 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
     def _set_menu_list(self):
         return self.controller.get_menu_data()
 
-    def _set_carusel_dict(self):
-        carusel_dict = dict()
-        # carusel 만들기
-        for menu in self.menu_list:
-            if menu.basic_img_path is not None:
-                carusel_dict.update(
-                    {f'{menu.menu_id:03d}': Carusel(self, self.menu_img_dict, menu)})
+    # def _set_carusel_dict(self):
+    #     carusel_dict = dict()
+    #     # carusel 만들기
+    #     for menu in self.menu_list:
+    #         if menu.basic_img_path is not None:
+    #             carusel_dict.update(
+    #                 {f'{menu.menu_id:03d}': Carusel(self, self.menu_img_dict, menu)})
+    #
+    #     return carusel_dict
 
-        return carusel_dict
-
-    def ask_set_or_single(self):
-        pass
-
-    def ask_quantity_if_menu_only_single(self):
-        pass
-
-    def add_basket_menu(self, menu_id):
-        pass
+    def add_basket_menu(self, menu_id, option_list):
+        self.now_basket: Basket
+        self.btn_confirm_order.setStyleSheet(f"background-color:{common.yellow}")
+        self.now_basket.add_item(menu_id, option_list)
+        self._refresh_cart_count_and_total_price()
+        print(self.now_basket)
 
     def _refresh_cart_count_and_total_price(self):
         self.now_basket: Basket
-        self.label_cart.setText(f'{len(self.now_basket.menu_id_list)}')
-        self.label_total_price_footer.setText(f'{sum(self.now_basket.price_list)}')
+        if self.now_basket is None:
+            self.label_item_count_footer.setText('0')
+            self.label_total_price_footer.setText('￦0')
+        else:
+            self.label_item_count_footer.setText(f'{len(self.now_basket.menu_id_list)}')
+            self.label_total_price_footer.setText(f'￦{sum(self.now_basket.price_list):,d}')
+
+    def _refresh_confirm_page(self):
+        self.label_small_price.setText(f'{self.now_basket.get_total_price()}')
+        self.label_total_price.setText(f'{self.now_basket.get_total_price()}')
+        # 아이템 리스트 추가하는 로직
+        v_layout = QtWidgets.QVBoxLayout(self.widget_confrim_item_area)
+        self.widget_confrim_item_area.setLayout(v_layout)
+        idx = 0
+        menu_id_list, option_list, price_list = self.now_basket.get_basket_as_zip()
+        for menu_id, option, price in zip(menu_id_list, option_list, price_list):
+            v_layout.addWidget(
+                ListConfirmItem(self, self.menu_list[menu_id - 1], self.menu_img_dict, self.menu_list, option, price,
+                                idx))
+            idx += 1
 
     def _grouping_carusel_widget(self):
         widget_list = list()
@@ -158,19 +184,34 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
 
     def _initialize_select_menu_page_carusel(self):
         # 추천 메뉴
-        page_1_menu_id_list = [5, 6, 3, 40, 52, 69]
+        if common.is_morning():
+            page_1_menu_id_list = [21, 24, 26, 40, 52, 69]
+        else:
+            page_1_menu_id_list = [5, 6, 3, 40, 52, 69]
         self._set_menu_carusel_on_select_page(1, page_1_menu_id_list)
         # 추천 메뉴 더 다양
-        page_2_menu_id_list = [x.menu_id for x in self.menu_list if
-                               x.marketing_priority == 1]
+        if common.is_morning():
+            page_2_menu_id_list = [x.menu_id for x in self.menu_list if
+                                   x.marketing_priority == 1 and x.is_mcmorning_service == 1]
+        else:
+            page_2_menu_id_list = [x.menu_id for x in self.menu_list if
+                                   x.marketing_priority == 1 and x.is_mcmorning_service != 1]
+
         self._set_menu_carusel_on_select_page(2, page_2_menu_id_list)
         # 버거 메뉴
         page_3_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 1]
         if common.is_morning():
+            self.label_home_1_title_3.hide()
+            self.btn_group_body.hide()
             page_3_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 2]
         self._set_menu_carusel_on_select_page(3, page_3_menu_id_list)
         # 해피스낵 메뉴
-        page_4_menu_id_list = [x.menu_id for x in self.menu_list if x.is_happy_snack == 1]
+        if common.is_morning():
+            page_4_menu_id_list = [x.menu_id for x in self.menu_list if x.is_happy_snack == 1
+                                   and x.is_mcmorning_service == 1]
+        else:
+            page_4_menu_id_list = [x.menu_id for x in self.menu_list if x.is_happy_snack == 1
+                                   and x.is_mcmorning_service != 1]
         self._set_menu_carusel_on_select_page(4, page_4_menu_id_list)
         # 사이드 메뉴
         page_5_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 3]
@@ -186,8 +227,11 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         page_8_menu_id_list.remove(72)  # 오렌지주스는 개별 구매 불가
         self._set_menu_carusel_on_select_page(8, page_8_menu_id_list)
         # 해피밀
-        page_9_menu_id_list = [x.menu_id for x in self.menu_list if
-                               x.is_asked_happy_meal == 1 and x.classification_id == 1]
+        if common.is_morning():
+            page_9_menu_id_list = [21, 24]
+        else:
+            page_9_menu_id_list = [x.menu_id for x in self.menu_list if
+                                   x.is_asked_happy_meal == 1 and x.classification_id == 1]
         self._set_menu_carusel_on_select_page(9, page_9_menu_id_list)
 
         # 버거 - 비프
@@ -242,8 +286,9 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
                 blank_label.setStyleSheet('background:transparent;')
                 page_widget.layout().addWidget(blank_label, row_index, col_index)
             else:
-                page_widget.layout().addWidget(Carusel(self, self.menu_img_dict, self.menu_list[idx - 1]),
-                                               row_index, col_index)
+                page_widget.layout().addWidget(
+                    Carusel(self, self.menu_img_dict, self.menu_list[idx - 1], self.menu_list),
+                    row_index, col_index)
             col_index += 1
             if col_index % 3 == 0:
                 col_index = 0
@@ -266,6 +311,9 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         if page_number in [6, 8]:
             selected_widget.setMinimumHeight(add_height + 200)
             selected_widget.setMaximumHeight(add_height + 200)
+        if page_number == 3 and common.is_morning():
+            selected_widget.setMinimumHeight(add_height + 200)
+            selected_widget.setMaximumHeight(add_height + 200)
 
         for idx in recommend_menu_list:
             if idx == 999:
@@ -277,7 +325,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
                     blank_label, row_index, col_index)
             else:
                 self.widget_carusel_menu_list[page_number - 1].layout().addWidget(
-                    Carusel(self, self.menu_img_dict, self.menu_list[idx - 1]),
+                    Carusel(self, self.menu_img_dict, self.menu_list[idx - 1], self.menu_list),
                     row_index, col_index)
             col_index += 1
             if col_index % 3 == 0:
@@ -331,6 +379,10 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
                 font: 16pt;
             }}''')
 
+        # gif 설정
+        self.qmovie_card_insert_gif = QtGui.QMovie('src/insert_card.gif')
+        self.label_card_insert_gif.setMovie(self.qmovie_card_insert_gif)
+
     def _init_timer(self):
         ad_timer = QtCore.QTimer()
         ad_timer.setInterval(3000)
@@ -340,27 +392,70 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
 
     def _selected_eat_way(self, way_str):
         # 장바구니 객체 만들기
-        self.now_basket = Basket(self.controller.connector)
+        self.now_basket = Basket(self.controller.connector, self.menu_list)
         self.now_basket.set_eat_way(way_str)
         # 메뉴 선택화면으로 전환
         self.main_stacked_widget.setCurrentIndex(2)
 
-    def _go_standby(self):
+    def _go_to_extra_order(self):
+        self.main_stacked_widget.setCurrentIndex(2)
+
+    def _go_to_standby_main(self):
         self.now_basket = None
         self.main_stacked_widget.setCurrentIndex(0)
+
+    def _go_select_eat_way(self):
+        self._reset_gui_and_attributes_before_get_orders()
+        self.main_stacked_widget.setCurrentIndex(1)
+
+    def _go_to_confirm_order(self):
+        self.main_stacked_widget.setCurrentIndex(3)
+        self._refresh_confirm_page()
+
+    def _go_to_ask_pay_way(self):
+        self.main_stacked_widget.setCurrentIndex(4)
+
+    def _pay_way_1_click_and_released_event(self, event):
+        self.main_stacked_widget.setCurrentIndex(5)
+        self.qmovie_card_insert_gif.start()
+        tempTimer = QtCore.QTimer(self)
+        tempTimer.singleShot(5000, lambda: self._update_order_on_db())
+
+    def _pay_way_2_click_and_released_event(self, event):
+        pass
+
+    def play_video(self, video_path):
+        video_url = QtCore.QUrl.fromLocalFile(video_path)
+        media_content = QMediaContent(video_url)
+        self.media_player.setMedia(media_content)
+        self.media_player.play()
+
+    def _update_order_on_db(self):
+        self.controller.add_order(self.now_basket)
+        end_page = ModalFinish()
+        end_page.show()
+        self._go_to_standby_main()
 
     def _set_btn_triggered(self):
         self.btn_take_out.clicked.connect(lambda state: self._selected_eat_way('take_out'))
         self.btn_restaurant.clicked.connect(lambda state: self._selected_eat_way('restaurant'))
-        self.btn_order_start.clicked.connect(lambda state: self.main_stacked_widget.setCurrentIndex(1))
+        self.btn_order_start.clicked.connect(lambda state: self._go_select_eat_way())
         self.btn_home_burger.clicked.connect(lambda state: self._banner_click_event(2))
         self.btn_home_coffee.clicked.connect(lambda state: self._banner_click_event(5))
         self.btn_home_recommend.clicked.connect(lambda state: self._banner_click_event(1))
         self.btn_home_happy_snack.clicked.connect(lambda state: self._banner_click_event(3))
         self.btn_season_ad_1.clicked.connect(lambda state: self._banner_click_event(2))
         self.btn_season_ad_2.clicked.connect(lambda state: self._banner_click_event(3))
-        self.btn_go_standby.clicked.connect(lambda state: self._go_standby())
-        self.btn_go_standby_2.clicked.connect(lambda state: self._go_standby())
+        self.btn_go_standby.clicked.connect(lambda state: self._go_to_standby_main())
+        self.btn_go_standby_2.clicked.connect(lambda state: self._go_to_standby_main())
+        self.btn_go_standby_3.clicked.connect(lambda state: self._go_to_standby_main())
+        self.btn_go_standby_4.clicked.connect(lambda state: self._go_to_standby_main())
+        self.btn_confirm_order.clicked.connect(lambda state: self._go_to_confirm_order())
+        self.btn_extra_order.clicked.connect(lambda state: self._go_to_extra_order())
+        self.pay_way_1.mouseReleaseEvent = self._pay_way_1_click_and_released_event
+        self.pay_way_2.mouseReleaseEvent = self._pay_way_2_click_and_released_event
+        self.btn_confirm_complete.clicked.connect(lambda state: self._go_to_ask_pay_way())
+
         self.btn_whole_burger.clicked.connect(lambda state: self._showing_selected_menu('전체'))
         self.btn_beef_burger.clicked.connect(lambda state: self._showing_selected_menu('비프'))
         self.btn_pig_burger.clicked.connect(lambda state: self._showing_selected_menu('불고기'))

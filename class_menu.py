@@ -70,12 +70,14 @@ class Menu:
 
     def get_calories(self):
         if self.calory is None or self.calory == 0:
-            return '0kcal'
+            return ''
         else:
             return self.calory
 
-    def now_price(self, option=None):
+    def now_price(self, option):
         if is_lunch() and self.is_lunch_menu:
+            if option is None or 'single' in option:
+                return self.ordinary_price
             return self.lunch_price
 
         if self.is_happy_snack:

@@ -62,7 +62,8 @@ class Order:
         self.conn.commit_db()
         self.conn.end_conn()
         order_menu_list = list()
-        for menu_id, option, price in self.basket.get_basket_as_zip():
+        menu_list, option_list, price_list = self.basket.get_basket_as_zip()
+        for menu_id, option, price in zip(menu_list, option_list, price_list):
             order_menu_list.append(OrderMenu(self.order_id, menu_id, option, price, self.conn))
         for order_menu in order_menu_list:
             order_menu.update_on_DB()
@@ -80,8 +81,8 @@ class Order:
 
         # 총액 구하기
         total_price = 0
-        for menu_id, option_list, item_price in basket.get_basket_as_zip():
-            total_price += item_price
+        menu_id, option_list, item_price = basket.get_basket_as_zip()
+        total_price = sum(item_price)
 
         # 주문번호가져오기
         order_number = connector.get_order_number(now_time_str)
