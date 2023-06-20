@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QPixmap
@@ -8,6 +9,7 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 import common
 from class_basket import Basket
 from class_controller import KioskController
+from class_ui_keboard import QRcodeInsertModal
 from class_ui_modal import ModalFinish, ListConfirmItem
 from ui_kiosk import Ui_MainWidget
 from class_carusel import Carusel
@@ -110,22 +112,11 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
     def _set_menu_list(self):
         return self.controller.get_menu_data()
 
-    # def _set_carusel_dict(self):
-    #     carusel_dict = dict()
-    #     # carusel 만들기
-    #     for menu in self.menu_list:
-    #         if menu.basic_img_path is not None:
-    #             carusel_dict.update(
-    #                 {f'{menu.menu_id:03d}': Carusel(self, self.menu_img_dict, menu)})
-    #
-    #     return carusel_dict
-
     def add_basket_menu(self, menu_id, option_list):
         self.now_basket: Basket
         self.btn_confirm_order.setStyleSheet(f"background-color:{common.yellow}")
         self.now_basket.add_item(menu_id, option_list)
         self._refresh_cart_count_and_total_price()
-        print(self.now_basket)
 
     def _refresh_cart_count_and_total_price(self):
         self.now_basket: Basket
@@ -137,12 +128,21 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
             self.label_total_price_footer.setText(f'￦{sum(self.now_basket.price_list):,d}')
 
     def _refresh_confirm_page(self):
-        self.label_small_price.setText(f'{self.now_basket.get_total_price()}')
-        self.label_total_price.setText(f'{self.now_basket.get_total_price()}')
+        now_layout = self.widget_confrim_item_area.layout()
+        if now_layout is not None:
+            while now_layout.count():
+                item = now_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+        else:
+            v_layout = QtWidgets.QVBoxLayout(self.widget_confrim_item_area)
+            self.widget_confrim_item_area.setLayout(v_layout)
+        self.label_small_price.setText(f'￦{self.now_basket.get_total_price():,d}')
+        self.label_total_price.setText(f'￦{self.now_basket.get_total_price():,d}')
         # 아이템 리스트 추가하는 로직
-        v_layout = QtWidgets.QVBoxLayout(self.widget_confrim_item_area)
-        self.widget_confrim_item_area.setLayout(v_layout)
         idx = 0
+        v_layout = self.widget_confrim_item_area.layout()
         menu_id_list, option_list, price_list = self.now_basket.get_basket_as_zip()
         for menu_id, option, price in zip(menu_id_list, option_list, price_list):
             v_layout.addWidget(
@@ -180,26 +180,45 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
             grid_layout.setContentsMargins(0, 0, 0, 0)
             i.setLayout(grid_layout)
 
+        # 추천 페이지 레이아웃 설정
+        grid_layout_upper = QtWidgets.QGridLayout(self.widget_upper_recommend)
+        grid_layout_upper.setContentsMargins(0, 0, 0, 0)
+        self.widget_upper_recommend.setLayout(grid_layout_upper)
+
+        grid_layout_lower = QtWidgets.QGridLayout(self.widget_lower_recommend)
+        grid_layout_lower.setContentsMargins(0, 0, 0, 0)
+        self.widget_lower_recommend.setLayout(grid_layout_lower)
+
         return widget_list
+
+    def _carusel_list_sorting(self, list_):
+        result_list = list()
+        selected_menu_list = [x for x in self.menu_list if x.menu_id in list_]
+        for i in range(1, 7):
+            for menu in selected_menu_list:
+                if menu.marketing_priority == i:
+                    result_list.append(menu.menu_id)
+        return result_list
 
     def _initialize_select_menu_page_carusel(self):
         # 추천 메뉴
         if common.is_morning():
-            page_1_menu_id_list = [21, 24, 26, 40, 52, 69]
+            page_1_menu_id_list = self._carusel_list_sorting([21, 24, 26, 40, 52, 69])
         else:
-            page_1_menu_id_list = [5, 6, 3, 40, 52, 69]
+            page_1_menu_id_list = self._carusel_list_sorting([5, 6, 3, 40, 52, 69])
         self._set_menu_carusel_on_select_page(1, page_1_menu_id_list)
         # 추천 메뉴 더 다양
         if common.is_morning():
-            page_2_menu_id_list = [x.menu_id for x in self.menu_list if
-                                   x.marketing_priority == 1 and x.is_mcmorning_service == 1]
+            page_2_menu_id_list = self._carusel_list_sorting([x.menu_id for x in self.menu_list if
+                                                              x.marketing_priority == 1 and x.is_mcmorning_service == 1])
         else:
-            page_2_menu_id_list = [x.menu_id for x in self.menu_list if
-                                   x.marketing_priority == 1 and x.is_mcmorning_service != 1]
+            page_2_menu_id_list = self._carusel_list_sorting([x.menu_id for x in self.menu_list if
+                                                              x.marketing_priority == 1 and x.is_mcmorning_service != 1])
 
         self._set_menu_carusel_on_select_page(2, page_2_menu_id_list)
         # 버거 메뉴
-        page_3_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 1]
+        page_3_menu_id_list = self._carusel_list_sorting(
+            [x.menu_id for x in self.menu_list if x.classification_id == 1])
         if common.is_morning():
             self.label_home_1_title_3.hide()
             self.btn_group_body.hide()
@@ -215,6 +234,10 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self._set_menu_carusel_on_select_page(4, page_4_menu_id_list)
         # 사이드 메뉴
         page_5_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 3]
+        page_5_menu_id_list.remove(74)
+        total_row = len(page_5_menu_id_list) // 3
+        self.widget_carusel_menu_5.setMinimumHeight(200 * total_row)
+        self.widget_carusel_menu_5.setMaximumHeight(200 * total_row)
         self._set_menu_carusel_on_select_page(5, page_5_menu_id_list)
         # 커피 메뉴
         page_6_menu_id_list = [x.menu_id for x in self.menu_list if x.classification_id == 5]
@@ -264,6 +287,12 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         page_others_id_list = [49, 50]
         self._set_menu_carusel_on_selected_origin_page(self.page_others, page_others_id_list)
 
+        # 함께 즐기면 더 좋습니다
+        sampled_list = [x.menu_id for x in self.menu_list if x.marketing_priority == 1 or x.marketing_priority == 2]
+        page_recommend_id_list = random.sample(sampled_list, 6)
+        self._set_menu_carusel_on_selected_origin_page(self.widget_upper_recommend, page_recommend_id_list[:3])
+        self._set_menu_carusel_on_selected_origin_page(self.widget_lower_recommend, page_recommend_id_list[3:])
+
     def _set_menu_carusel_on_selected_origin_page(self, page_widget, menu_id_list):
         recommend_menu_list = menu_id_list
         while len(recommend_menu_list) < 3:
@@ -308,10 +337,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         selected_widget.setMinimumHeight(add_height)
         selected_widget.setMaximumHeight(add_height)
 
-        if page_number in [6, 8]:
-            selected_widget.setMinimumHeight(add_height + 200)
-            selected_widget.setMaximumHeight(add_height + 200)
-        if page_number == 3 and common.is_morning():
+        if page_number in [3, 5, 6, 8]:
             selected_widget.setMinimumHeight(add_height + 200)
             selected_widget.setMaximumHeight(add_height + 200)
 
@@ -412,6 +438,10 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.main_stacked_widget.setCurrentIndex(3)
         self._refresh_confirm_page()
 
+    def _go_to_qr_code(self):
+        self.qr_page = QRcodeInsertModal(self)
+        self.qr_page.show()
+
     def _go_to_ask_pay_way(self):
         self.main_stacked_widget.setCurrentIndex(4)
 
@@ -431,10 +461,22 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.media_player.play()
 
     def _update_order_on_db(self):
-        self.controller.add_order(self.now_basket)
+        order_number = self.controller.add_order(self.now_basket)
+        self.main_stacked_widget.setCurrentIndex(6)
+        self.label_receipt.setText(order_number)
+        temp_timer = QtCore.QTimer(self)
+        temp_timer.singleShot(3000, lambda: self._showing_finish_modal())
+        temp_timer.singleShot(5000, lambda: self._go_to_standby_main())
+
+    def _showing_finish_modal(self):
         end_page = ModalFinish()
         end_page.show()
-        self._go_to_standby_main()
+
+    def _ask_recommend_page(self):
+        self.main_stacked_widget.setCurrentIndex(7)
+
+    def _no_select_recommend(self):
+        self._go_to_extra_order()
 
     def _set_btn_triggered(self):
         self.btn_take_out.clicked.connect(lambda state: self._selected_eat_way('take_out'))
@@ -455,6 +497,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.pay_way_1.mouseReleaseEvent = self._pay_way_1_click_and_released_event
         self.pay_way_2.mouseReleaseEvent = self._pay_way_2_click_and_released_event
         self.btn_confirm_complete.clicked.connect(lambda state: self._go_to_ask_pay_way())
+        self.btn_no_select.clicked.connect(lambda state: self._no_select_recommend())
 
         self.btn_whole_burger.clicked.connect(lambda state: self._showing_selected_menu('전체'))
         self.btn_beef_burger.clicked.connect(lambda state: self._showing_selected_menu('비프'))
@@ -467,6 +510,11 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.btn_others.clicked.connect(lambda state: self._showing_selected_menu('그 외'))
         for idx, banner in enumerate(self.banners):
             banner.mousePressEvent = lambda e, y=idx: self._banner_click_event(y)
+
+        self.qr_section_1.mouseReleaseEvent = lambda e: self._go_to_qr_code()
+        self.qr_section_2.mouseReleaseEvent = lambda e: self._go_to_qr_code()
+        self.qr_section_3.mouseReleaseEvent = lambda e: self._go_to_qr_code()
+        self.qr_section_4.mouseReleaseEvent = lambda e: self._go_to_qr_code()
 
     # 배너가 클릭되었을 떄, body_stacked_widget 인덱스가 바뀌는 것
     def _banner_click_event(self, index):
@@ -489,3 +537,18 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
             if file_name.startswith('ad'):
                 result_list.append(QtGui.QPixmap(f'src/{file_name}'))
         return result_list
+
+    def update_stepper_value_btn_plus(self, index):
+        self.now_basket.increase_item(index)
+        self._refresh_cart_count_and_total_price()
+        self._refresh_confirm_page()
+
+    def update_stepper_value_btn_minus(self, index):
+        self.now_basket.decrease_item(index)
+        self._refresh_cart_count_and_total_price()
+        self._refresh_confirm_page()
+
+    def delete_basket_item(self, index):
+        self.now_basket.delete_item(index)
+        self._refresh_cart_count_and_total_price()
+        self._refresh_confirm_page()

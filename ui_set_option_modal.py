@@ -147,7 +147,7 @@ class Ui_Modal_set_option(object):
 "    font: 24pt;\n"
 "}\n"
 "\n"
-"#label_info_set, #label_info_single{\n"
+"#label_info_set, #label_info_single, #label_menu_title_2{\n"
 "    font: 14pt;\n"
 "}\n"
 "\n"

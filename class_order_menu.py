@@ -18,9 +18,3 @@ class OrderMenu:
                   (self.order_id, self.menu_id, option_str, self.price))
         self.conn.commit_db()
         self.conn.end_conn()
-
-
-if __name__ == '__main__':
-    connector = KioskDBConnector()
-    om_1 = OrderMenu(1, 1, [1, ], connector)
-    om_1.update_on_DB()

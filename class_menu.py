@@ -75,21 +75,30 @@ class Menu:
             return self.calory
 
     def now_price(self, option):
-        if is_lunch() and self.is_lunch_menu:
-            if option is None or 'single' in option:
-                return self.ordinary_price
+        if is_lunch() and self.is_lunch_menu == 1:
             return self.lunch_price
 
-        if self.is_happy_snack:
+        if self.is_happy_snack == 1:
             return self.happy_snack_price
 
-        if option == 'small':
+        if (isinstance(option, str) and option == 'set') or \
+                (isinstance(option, list) and 'set' in option):
+            return self.set_price
+
+        if (isinstance(option, str) and option == 'combo') or \
+                (isinstance(option, list) and 'combo' in option):
+            return self.combo_price
+
+        if (isinstance(option, str) and option == 'small') or \
+                (isinstance(option, list) and 'small' in option):
             return self.small_price
 
-        if option == 'medium':
+        if (isinstance(option, str) and option == 'medium') or \
+                (isinstance(option, list) and 'medium' in option):
             return self.medium_price
 
-        if option == 'large':
+        if (isinstance(option, str) and option == 'large') or \
+                (isinstance(option, list) and 'large' in option):
             return self.large_price
 
         return self.ordinary_price

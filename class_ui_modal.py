@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
 
+import common
 from class_menu import Menu
 from ui_set_option_modal import Ui_Modal_set_option
 from ui_pay_finish import Ui_Modal_finish
@@ -41,19 +42,43 @@ class ListConfirmItem(QtWidgets.QWidget, Ui_WidgetConfirmItem):
             self.label_option_list.show()
             self.btn_detail_menu_info.show()
             title = title + '세트'
-            self.label_option_list.setText(f'{self.option}')
+
+            option_info = list()
+            if isinstance(self.option[-2], str) and self.option[-2].isdigit():
+                side_menu_id = int(self.option[-2])
+                option_info.append(f'{self.total_menu_list[side_menu_id - 1].name}')
+            if isinstance(self.option[-1], str) and self.option[-1].isdigit():
+                beverage_menu_id = int(self.option[-1])
+                option_info.append(f'{self.total_menu_list[beverage_menu_id - 1].name}')
+            self.label_option_list.setText(','.join(option_info))
             self.label_img.setPixmap(self.pixmap_dict[self.menu_info.get_set_img_path()])
         else:
+            if self.menu_info.classification_id == 1:
+                title = title + '버거 단품'
+            else:
+                title = title + '\n'
             self.label_img.setPixmap(self.pixmap_dict[self.menu_info.get_basic_img_path()])
         title = title + f' {self.menu_info.get_calories()}'
         self.label_menu_name_and_calories.setText(title)
 
-        self.label_price.setText(f'{self.price}')
+        self.label_price.setText(f'￦{self.price:,d}')
 
         # stepper 초기화
-        self.btn_minus.setStyleSheet('background-color:#e3e3e3')
-        self.btn_plus.setStyleSheet('background-color:white')
-        self.label_item_count.setText('1')
+        self.label_item_count.setText(f'{self.option[0]}')  # menu count
+        # 1과 같아지면 버튼 비활성화
+        if self.option[0] <= 1:
+            self.btn_minus.setEnabled(False)
+            self.btn_minus.setStyleSheet('background-color:#e3e3e3')
+        # 2, 9부터는 둘다 활성화
+        if self.option[0] == 2 or self.option[0] == 9:
+            self.btn_minus.setEnabled(True)
+            self.btn_minus.setStyleSheet('background-color:white')
+            self.btn_plus.setEnabled(True)
+            self.btn_plus.setStyleSheet('background-color:white')
+        # 10과 같아지면 버튼 비활성화
+        if self.option[0] >= 10:
+            self.btn_plus.setEnabled(False)
+            self.btn_plus.setStyleSheet('background-color:#e3e3e3')
 
     def _set_btn_triggered(self):
         self.btn_delete.clicked.connect(lambda state: self._delete_row())
@@ -64,26 +89,17 @@ class ListConfirmItem(QtWidgets.QWidget, Ui_WidgetConfirmItem):
         label_counter = self.label_item_count
         int_value = int(label_counter.text())
         int_value += value
-        # 1과 같아지면 버튼 비활성화
-        if int_value == 1:
-            self.btn_minus.setEnabled(False)
-            self.btn_minus.setStyleSheet('background-color:#e3e3e3')
-        # 2, 9부터는 둘다 활성화
-        if int_value == 2 or int_value == 9:
-            self.btn_minus.setEnabled(True)
-            self.btn_minus.setStyleSheet('background-color:white')
-            self.btn_plus.setEnabled(True)
-            self.btn_plus.setStyleSheet('background-color:white')
-        # 10과 같아지면 버튼 비활성화
-        if int_value == 10:
-            self.btn_plus.setEnabled(False)
-            self.btn_plus.setStyleSheet('background-color:#e3e3e3')
 
         label_counter.setText(str(int_value))
 
+        if value == -1:
+            self.parent.update_stepper_value_btn_minus(self.item_row_index)
+        elif value == 1:
+            self.parent.update_stepper_value_btn_plus(self.item_row_index)
+
     def _delete_row(self):
-        #self.item_row_index
-        pass
+        self.parent.delete_basket_item(self.item_row_index)
+
 
 class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
     def __init__(self, parent, menu_info, pixmap_dict, total_menu_list):
@@ -97,10 +113,10 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         self.total_menu_list = total_menu_list
         self.banner_list = self._set_banner_groups()
         self.now_index = 0
-
+        self._option_list = None
+        self._reset_option_list()
         self._config_labels()
         self._set_btn_triggered()
-        self._option_list = None
         self._stepper_add(self.label_item_count_1, 0)
         self._stepper_add(self.label_item_count_2, 0)
         self._initialize_widget_select_area()
@@ -182,13 +198,17 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
 
     def _refresh_title_name_label(self):
         # 세부 상단 메뉴 이름
-        title_info = f'{self.menu_info.name}\n￦{self.menu_info.now_price(None)} {self.menu_info.get_calories()}'
+        option = None
+        if self._option_list is not None:
+            option = self._option_list
+        quantity = int(self.label_item_count_2.text())
+        title_info = f'''{self.menu_info.name}\n￦{self.menu_info.now_price(option) * quantity:,d} {common.calories_handler(self.menu_info.get_calories())*quantity:,}kcal'''
         self.label_menu_name_header_name_1.setText(title_info)
         self.label_menu_name_header_name_2.setText(title_info)
         self.label_menu_name_header_name_3.setText(title_info)
         self.label_menu_name_header_name_4.setText(title_info)
         self.label_menu_title.setText(title_info)
-        self.label_menu_title_2.setText(title_info)
+        # self.label_menu_title_2.setText(title_info)
 
         if self.now_index == 0:
             self.label_banner_1.setText('세트 크기 선택')
@@ -208,8 +228,6 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
 
     def _config_labels(self):
         self.label_menu_name.setText(self.menu_info.name)
-        # self.label_info_set.setText('세트 선택')
-        # self.label_info_single.setText(f'단품 선택\n{self.menu_info.now_price()}원 {self.menu_info.get_calories()}')
         self._refresh_title_name_label()
 
         # 이미지 넣기
@@ -225,7 +243,7 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
 
         # 세트 or 단품
         self.label_info_set.setText('세트 선택')
-        self.label_info_single.setText(f'단품 선택\n{self.menu_info.now_price(None)}원 {self.menu_info.get_calories()}')
+        self.label_info_single.setText(f'단품 선택\n{self.menu_info.now_price(None):,d}원 {self.menu_info.get_calories()}')
         self.label_set_image.setPixmap(self.pixmap_dict[self.menu_info.get_set_img_path()])
         self.label_single_image.setPixmap(self.pixmap_dict[self.menu_info.get_basic_img_path()])
 
@@ -331,6 +349,7 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         self.close()
 
     def _go_to_select_menu_page(self):
+        self.parent._ask_recommend_page()
         self.close()
 
     def _stepper_add(self, label_counter, value):
@@ -363,6 +382,15 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
             self.btn_plus_2.setStyleSheet('background-color:#e3e3e3')
 
         label_counter.setText(str(int_value))
+        self._refresh_label_on_count_page(label_counter)
+        self._refresh_title_name_label()
+
+    def _refresh_label_on_count_page(self, label_counter):
+        quantity = int(label_counter.text())
+        name = self.menu_info.name
+        price = self.menu_info.now_price(self._option_list) * quantity
+        calories = common.calories_handler(self.menu_info.get_calories()) * quantity
+        self.label_menu_title_2.setText(f"""{name}\n￦{price:,d} {calories:,d}kcal""")
 
     def left_widget_click_event(self, event):
         self.label_set_image.setMaximumSize(180, 180)
@@ -386,6 +414,8 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         # 옵션을 추가할 수 있게 하는 로직
         self.body_stacked_widget.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(1)
+        if common.is_morning():
+            self.add_option(['set'])
 
     def _go_to_single_option(self):
         # 카운트 페이지로 넘어가는 로직

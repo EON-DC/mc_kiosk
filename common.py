@@ -47,6 +47,20 @@ def is_lunch(input_datetime=None):
         return False
 
 
+def calories_handler(calories_str):
+    calories_str: str
+    numeric_value = list()
+    for i in calories_str:
+        if i.isdigit():
+            numeric_value.append(i)
+
+    if len(numeric_value) != 0:
+        result_cal = int(''.join(numeric_value))
+    else:
+        result_cal = 0
+    return result_cal
+
+
 if __name__ == '__main__':
     # conn = sqlite3.connect('mac_db.db')
     # df = pd.read_sql('select * from tb_order', conn)

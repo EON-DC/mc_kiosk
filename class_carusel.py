@@ -57,5 +57,4 @@ class Carusel(QtWidgets.QWidget, Ui_Carusel):
         price = self.menu_info.now_price(None)
         if price is None:
             price = self.menu_info.additional_price
-        calories = self.menu_info.calory
-        self.menu_price_cal.setText(f'{price}원 {self.menu_info.get_calories()}')
+        self.menu_price_cal.setText(f'{price:,d}원 {self.menu_info.get_calories()}')

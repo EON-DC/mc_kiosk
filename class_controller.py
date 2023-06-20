@@ -12,4 +12,5 @@ class KioskController:
 
     def add_order(self, basket):
         order = Order.create_order(basket, self.connector, True)
-        return order.order_id
+        print(f"updated on DB (logged by controller) : {order}")
+        return order.order_number

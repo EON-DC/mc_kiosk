@@ -50,14 +50,16 @@ class Order:
             self.order_id = last_index + 1
             c.execute(
                 'insert into tb_order(order_id, order_date, location_id, ' +
-                'order_status_id, qr_code_id, order_number,total_price) values (?, ?, ?, ?, ?, ?, ?)',
-                (self.order_id, self.order_date, location_id, 1, self.qr_code_id, self.order_number, self.total_price,))
+                'order_status_id, qr_code_id, order_number,total_price, eat_way) values (?, ?, ?, ?, ?, ?, ?, ?)',
+                (self.order_id, self.order_date, location_id, 1, self.qr_code_id, self.order_number, self.total_price,
+                 self.basket.eat_way))
         else:
             c.execute(
                 'update tb_order ' +
                 'set order_id = (?), order_date = (?), location_id = (?), ' +
-                'order_status_id = (?), qr_code_id =(?), order_number = (?), total_price= (?))',
-                (self.order_id, self.order_date, location_id, 1, self.qr_code_id, self.order_number, self.total_price,))
+                'order_status_id = (?), qr_code_id =(?), order_number = (?), total_price= (?), eat_way = (?))',
+                (self.order_id, self.order_date, location_id, 1, self.qr_code_id, self.order_number, self.total_price,
+                 self.basket.eat_way))
         # TODO: basket 정보 DB에 업데이트하는 로직 필요
         self.conn.commit_db()
         self.conn.end_conn()

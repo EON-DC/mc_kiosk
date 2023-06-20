@@ -26,7 +26,7 @@ class Basket:
             name = self.conn.get_menu_name_by_menu_id(menu_id)
             item_quantity = self.option_list[index][0]
             residual_option = self.option_list[index][1:]
-            menu_name_list.append((name, str(item_quantity) + '개', residual_option, str(self.price_list[index]) + '원'))
+            menu_name_list.append((name, str(item_quantity) + '개', residual_option, f'{self.price_list[index]:,d}원'))
         return str(menu_name_list)
 
     def set_eat_way(self, eat_way):
@@ -95,7 +95,6 @@ class Basket:
     def get_price_2(self, menu_id, option):
         result_price = 0
         quantity = option[0]
-        print(option)
         menu = self.total_menu_list[menu_id - 1]
         if 'set' in option:
             if menu.set_order_can_it_order_side_menu and option[-2] is not None and option[-2].isdigit():
@@ -176,14 +175,13 @@ class Basket:
         self.option_list[index][0] += 1
         self.refresh_price_list()
 
+    def delete_item(self, index):
+        self.menu_id_list.pop(index)
+        self.option_list.pop(index)
+        self.price_list.pop(index)
+
     def get_total_price(self):
         return sum(self.price_list)
 
 
-if __name__ == '__main__':
-    conn = KioskDBConnector()
-    basket = Basket(conn)
-    basket.add_item(1, [1, 'set', 'large', 35, 65])
-    basket.add_item(3, [2, 'set', 35, 65])
-    basket.add_item(45, [2])
-    basket.decrease_item(1)
+

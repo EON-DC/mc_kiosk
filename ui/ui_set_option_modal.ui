@@ -158,7 +158,7 @@ QPushButton:Pressed {
 	font: 24pt;
 }
 
-#label_info_set, #label_info_single{
+#label_info_set, #label_info_single, #label_menu_title_2{
 	font: 14pt;
 }
 

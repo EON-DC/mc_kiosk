@@ -53,3 +53,4 @@ class CaruselOption(QtWidgets.QWidget, Ui_Carusel):
             self.menu_price_cal.setText(f"")
         else:
             self.menu_price_cal.setText(f'+{self.menu_info.additional_price}원 {self.menu_info.get_calories()}')
+
