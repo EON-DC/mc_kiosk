@@ -1,20 +1,18 @@
 import datetime
+import os
 import random
 
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
 
 import common
 from class_basket import Basket
+from class_carusel import Carusel
 from class_controller import KioskController
 from class_ui_keboard import QRcodeInsertModal
 from class_ui_modal import ModalFinish, ListConfirmItem
 from ui_kiosk import Ui_MainWidget
-from class_carusel import Carusel
-from PyQt5 import QtCore, QtGui, QtWidgets
-import os
 
 
 class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
@@ -22,16 +20,20 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         assert isinstance(controller, KioskController)
         super().__init__()
         self.setupUi(self)
+        self.setGeometry(30, 30, 540, 960)
         self.controller = controller
         self.ad_pixmap_list = self._get_pixmap_ad_list()
         self.ad_index = 0
         self.menu_list = self._set_menu_list()
         self._set_standby_initial()
-        self.ad_timer = self._init_timer()
+        self.opened_modal_list = list()
+        self.ad_timer = self._init_ad_timer()
         self.banners = self._get_banners()
         self.qmovie_card_insert_gif = None
         self._adjustment_style_detail()
         self.menu_img_dict = self._set_pixmap_list()
+        self.refractory_timer = QtCore.QTimer(self)
+        self.is_refractory_period = False
         # self.menu_carusel_dict = self._set_carusel_dict()
         self._set_btn_triggered()
         self.yellow_under_lines = self._get_yellow_underlines()
@@ -43,10 +45,32 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         # self.burger_carusel_list, self.coffee_carusel_list = self._set_burger_and_coffee_carusel_list()
         self._reset_gui_and_attributes_before_get_orders()
+        self._set_language('kor')
+        self.order_time_limit_timer = None
+        self.qr_page = None
+
+    def set_refractory_period(self):
+        self.is_refractory_period = True
+        self.refractory_timer.singleShot(1000, lambda: self.set_enable_button())
+
+    def set_enable_button(self):
+        self.is_refractory_period = False
+
+    def add_opened_modal(self, modal):
+        self.opened_modal_list.append(modal)
+
+    def _set_order_limit_timer(self, timer_option=None):
+        if isinstance(self.order_time_limit_timer, QtCore.QTimer):
+            self.order_time_limit_timer.stop()
+            self.order_time_limit_timer.deleteLater()
+        self.order_time_limit_timer = QtCore.QTimer(self)  # 1000 * 60 * 5
+        if timer_option == 'longer':
+            self.order_time_limit_timer.singleShot(1000 * 60 * 5, lambda: self._go_to_standby_main())  # 5min
+        self.order_time_limit_timer.singleShot(1000 * 60, lambda: self._go_to_standby_main(force=True))  # 1min
 
     def _reset_gui_and_attributes_before_get_orders(self):
         self.btn_confirm_order.setStyleSheet(f"background-color:white")
-
+        self.body_stacked_widget.setCurrentIndex(0)
         self.stackedWidget_carusel_menu_burger.setCurrentIndex(0)
         self.stackedWidget_carusel_menu_coffee.setCurrentIndex(0)
 
@@ -114,7 +138,11 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
 
     def add_basket_menu(self, menu_id, option_list):
         self.now_basket: Basket
+        if self.now_basket is None:
+            self.now_basket = Basket(self.controller.connector, self.menu_list)
+            self._set_order_limit_timer()
         self.btn_confirm_order.setStyleSheet(f"background-color:{common.yellow}")
+        self._set_order_limit_timer('longer')
         self.now_basket.add_item(menu_id, option_list)
         self._refresh_cart_count_and_total_price()
 
@@ -409,7 +437,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.qmovie_card_insert_gif = QtGui.QMovie('src/insert_card.gif')
         self.label_card_insert_gif.setMovie(self.qmovie_card_insert_gif)
 
-    def _init_timer(self):
+    def _init_ad_timer(self):
         ad_timer = QtCore.QTimer()
         ad_timer.setInterval(3000)
         ad_timer.timeout.connect(self._change_ad_page)
@@ -417,8 +445,6 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         return ad_timer
 
     def _selected_eat_way(self, way_str):
-        # 장바구니 객체 만들기
-        self.now_basket = Basket(self.controller.connector, self.menu_list)
         self.now_basket.set_eat_way(way_str)
         # 메뉴 선택화면으로 전환
         self.main_stacked_widget.setCurrentIndex(2)
@@ -426,21 +452,63 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
     def _go_to_extra_order(self):
         self.main_stacked_widget.setCurrentIndex(2)
 
-    def _go_to_standby_main(self):
-        self.now_basket = None
-        self.main_stacked_widget.setCurrentIndex(0)
+    def _go_to_standby_main(self, force=False):
+        if self.now_basket is not None and len(self.now_basket.menu_id_list) != 0:
+            if force is False:
+                text = "장바구니에 담긴 상품이 있습니다. 처음으로 돌아갈 경우 다시 선택하셔야합니다. 그래도 돌아가시겠습니까?"
+                dialog = QtWidgets.QMessageBox.question(self, '확인', text)
+                if dialog == QtWidgets.QMessageBox.Yes:
+                    self.now_basket = None
+                    self.main_stacked_widget.setCurrentIndex(0)
+            else:
+                self.now_basket = None
+                self.main_stacked_widget.setCurrentIndex(0)
+        elif self.now_basket is None or len(self.now_basket.menu_id_list) == 0:
+            self.now_basket = None
+            self.main_stacked_widget.setCurrentIndex(0)
+
+        # 새로 열린창들 닫기
+        while len(self.opened_modal_list) > 0:
+            modal = self.opened_modal_list.pop()
+            if modal is not None:
+                modal.close()
+
+        self.order_time_limit_timer = None  # 타이머 초기화
 
     def _go_select_eat_way(self):
         self._reset_gui_and_attributes_before_get_orders()
         self.main_stacked_widget.setCurrentIndex(1)
+        # 장바구니 객체 만들기
+        if self.now_basket is None:
+            self.now_basket = Basket(self.controller.connector, self.menu_list)
+            self._set_order_limit_timer()
 
     def _go_to_confirm_order(self):
         self.main_stacked_widget.setCurrentIndex(3)
         self._refresh_confirm_page()
 
     def _go_to_qr_code(self):
-        self.qr_page = QRcodeInsertModal(self)
+        if self.qr_page is None:
+            self.qr_page = QRcodeInsertModal(self)
+            # self.opened_modal_list.append(self.qr_page)
         self.qr_page.show()
+
+    def set_qr_code(self, code):
+        if self.controller.match_qr_code(code):
+            if self.main_stacked_widget.currentIndex() == 0:
+                self._go_select_eat_way()
+            QtWidgets.QMessageBox.information(self.qr_page, '정상', '정상적으로 QR code가 입력되었습니다.')
+            self.qr_page.close()
+            self.qr_page.deleteLater()
+            self.qr_page = None
+            if self.now_basket is None:
+                self.now_basket = Basket(self.controller.connector, self.menu_list)
+                self._set_order_limit_timer()
+            self.now_basket.qr_code_id = code
+            return True
+        else:
+            QtWidgets.QMessageBox.warning(self.qr_page, "잘못된 번호", "존재하지 않는 QR code입니다. 다시 입력해주세요.")
+            return False
 
     def _go_to_ask_pay_way(self):
         self.main_stacked_widget.setCurrentIndex(4)
@@ -452,13 +520,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         tempTimer.singleShot(5000, lambda: self._update_order_on_db())
 
     def _pay_way_2_click_and_released_event(self, event):
-        pass
-
-    def play_video(self, video_path):
-        video_url = QtCore.QUrl.fromLocalFile(video_path)
-        media_content = QMediaContent(video_url)
-        self.media_player.setMedia(media_content)
-        self.media_player.play()
+        self._go_to_qr_code()
 
     def _update_order_on_db(self):
         order_number = self.controller.add_order(self.now_basket)
@@ -466,6 +528,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.label_receipt.setText(order_number)
         temp_timer = QtCore.QTimer(self)
         temp_timer.singleShot(3000, lambda: self._showing_finish_modal())
+        self.now_basket = None
         temp_timer.singleShot(5000, lambda: self._go_to_standby_main())
 
     def _showing_finish_modal(self):
@@ -478,10 +541,43 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
     def _no_select_recommend(self):
         self._go_to_extra_order()
 
+    def _set_language(self, nation):
+        selected_style = """QPushButton{
+            border-color: #ffbc0d;
+            border-style: solid;
+            border-width: 5px;
+        }"""
+        blank_style = ''
+        if nation == 'eng':
+            self.btn_lang_kor.setStyleSheet(blank_style)
+            self.btn_lang_eng.setStyleSheet(selected_style)
+            self.btn_restaurant.setText('Eat on restaurant\n\n\n\n\n\n\n\n\n\n')
+            self.btn_take_out.setText('Take out\n\n\n\n\n\n\n\n\n\n')
+            self.btn_go_standby_2.setText('Return to initial page')
+            self.btn_help_stanby_3.setText('I need help')
+            self.label_2.setText('Select your eat way')
+            self.label_3.setText('Language')
+            self.label_scan_qr_code_stanby_3.setText('Scan QR code')
+
+        elif nation == 'kor':
+            self.btn_lang_kor.setStyleSheet(selected_style)
+            self.btn_lang_eng.setStyleSheet(blank_style)
+            self.btn_restaurant.setText('매장에서 식사\n\n\n\n\n\n\n\n\n\n')
+            self.btn_take_out.setText('테이크 아웃\n\n\n\n\n\n\n\n\n\n')
+            self.btn_go_standby_2.setText('처음으로')
+            self.btn_help_stanby_3.setText('도움 기능')
+            self.label_2.setText('식사방법을 선택해주세요')
+            self.label_3.setText('언어')
+            self.label_scan_qr_code_stanby_3.setText('QR코드를 스캔하세요')
+
     def _set_btn_triggered(self):
+        self.btn_lang_eng.clicked.connect(lambda state: self._set_language('eng'))
+        self.btn_lang_kor.clicked.connect(lambda state: self._set_language('kor'))
+
         self.btn_take_out.clicked.connect(lambda state: self._selected_eat_way('take_out'))
         self.btn_restaurant.clicked.connect(lambda state: self._selected_eat_way('restaurant'))
         self.btn_order_start.clicked.connect(lambda state: self._go_select_eat_way())
+        self.btn_language_stanby.clicked.connect(lambda state: self._go_select_eat_way())
         self.btn_home_burger.clicked.connect(lambda state: self._banner_click_event(2))
         self.btn_home_coffee.clicked.connect(lambda state: self._banner_click_event(5))
         self.btn_home_recommend.clicked.connect(lambda state: self._banner_click_event(1))
@@ -492,6 +588,7 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         self.btn_go_standby_2.clicked.connect(lambda state: self._go_to_standby_main())
         self.btn_go_standby_3.clicked.connect(lambda state: self._go_to_standby_main())
         self.btn_go_standby_4.clicked.connect(lambda state: self._go_to_standby_main())
+        self.btn_back_pay_way.clicked.connect(lambda state: self._go_to_confirm_order())
         self.btn_confirm_order.clicked.connect(lambda state: self._go_to_confirm_order())
         self.btn_extra_order.clicked.connect(lambda state: self._go_to_extra_order())
         self.pay_way_1.mouseReleaseEvent = self._pay_way_1_click_and_released_event
@@ -539,14 +636,20 @@ class MainWindow(QtWidgets.QWidget, Ui_MainWidget):
         return result_list
 
     def update_stepper_value_btn_plus(self, index):
+        if self.is_refractory_period is True:
+            return
         self.now_basket.increase_item(index)
         self._refresh_cart_count_and_total_price()
         self._refresh_confirm_page()
+        self.set_refractory_period()
 
     def update_stepper_value_btn_minus(self, index):
+        if self.is_refractory_period is True:
+            return
         self.now_basket.decrease_item(index)
         self._refresh_cart_count_and_total_price()
         self._refresh_confirm_page()
+        self.set_refractory_period()
 
     def delete_basket_item(self, index):
         self.now_basket.delete_item(index)

@@ -2015,7 +2015,7 @@ price calories</string>
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="btn_nutrition_set">
                <property name="minimumSize">
                 <size>
                  <width>80</width>
@@ -2746,7 +2746,7 @@ price| calories</string>
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QPushButton" name="pushButton">
+                       <widget class="QPushButton" name="btn_nutrition_count">
                         <property name="minimumSize">
                          <size>
                           <width>120</width>

@@ -1,7 +1,4 @@
-import datetime
 import re
-import sqlite3
-import time
 
 from class_basket import Basket
 from class_db_connect import KioskDBConnector

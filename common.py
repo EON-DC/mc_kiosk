@@ -1,7 +1,4 @@
 import datetime
-import sqlite3
-
-import pandas as pd
 
 tb_menu_col_name = ['name', 'menu_id', 'classification_id', 'marketing_priority', 'is_mcmorning_service',
                     'is_ordinary_service', 'is_lunch_menu', 'is_happy_snack', 'is_new_menu', 'is_asked_additional_side',

@@ -1,8 +1,7 @@
-from PyQt5.QtCore import Qt
+from PyQt5 import QtWidgets
 
 from class_menu import Menu
 from ui_carusel import Ui_Carusel
-from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class CaruselOption(QtWidgets.QWidget, Ui_Carusel):

@@ -1,12 +1,13 @@
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 import common
-from class_menu import Menu
-from ui_set_option_modal import Ui_Modal_set_option
-from ui_pay_finish import Ui_Modal_finish
-from ui_widget_list_item import Ui_WidgetConfirmItem
-from PyQt5 import QtCore, QtGui, QtWidgets
 from class_carusel_option import CaruselOption
+from class_menu import Menu
+from ui_nutrition_form import Ui_NutritionForm
+from ui_pay_finish import Ui_Modal_finish
+from ui_set_option_modal import Ui_Modal_set_option
+from ui_widget_list_item import Ui_WidgetConfirmItem
 
 
 class ModalFinish(QtWidgets.QWidget, Ui_Modal_finish):
@@ -16,6 +17,46 @@ class ModalFinish(QtWidgets.QWidget, Ui_Modal_finish):
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.timer = QtCore.QTimer(self)
         self.timer.singleShot(2000, lambda: self.close())
+
+
+class ModalNutrition(QtWidgets.QWidget, Ui_NutritionForm):
+    def __init__(self, grand_parent, parent, menu_info, pixmap_dict, total_menu_list):
+        super().__init__()
+        self.setupUi(self)
+        self.setGeometry(50, 230, 500, 500)
+        self.grand_parent = grand_parent
+        self.parent = parent
+        self.menu_info = menu_info
+        self.pixmap_dict = pixmap_dict
+        self.total_menu_list = total_menu_list
+        self.setStyleSheet(self.grand_parent.styleSheet())
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.btn_close.clicked.connect(lambda state: self.close())
+        self.widget.setStyleSheet('background-color: white;')
+
+    def show(self):
+        self._reset_labels()
+        super().show()
+
+    def _reset_labels(self):
+        self.label_table_header_11.setText(f'{self.menu_info.weight}')
+        self.label_table_header_12.setText(f'{self.menu_info.volume}')
+        self.label_table_header_13.setText(f'{self.menu_info.calory}')
+        self.label_table_header_14.setText(f'{self.menu_info.glucose}')
+        self.label_table_header_15.setText(f'{self.menu_info.protein}')
+        self.label_table_header_16.setText(f'{self.menu_info.lipid}')
+        self.label_table_header_17.setText(f'{self.menu_info.natrium}')
+        self.label_table_header_18.setText(f'{self.menu_info.caffeine}')
+        self.label_table_header_20.setText(f'{self.menu_info.level_1}')
+        self.label_table_header_21.setText(f'{self.menu_info.level_2}')
+        self.label_table_header_22.setText(f'{self.menu_info.level_3}')
+        self.label_table_header_23.setText(f'{self.menu_info.level_4}')
+        self.label_table_header_24.setText(f'{self.menu_info.level_5}')
+        self.label_table_header_25.setText(f'{self.menu_info.level_6}')
+        self.label_table_header_26.setText(f'{self.menu_info.level_7}')
+        self.label_table_header_27.setText(f'{self.menu_info.level_8}')
+        self.label_allergy_info.setText(f'{self.menu_info.allergy_info}')
+        self.label_food_origin_info.setText(f'{self.menu_info.country_info}')
 
 
 class ListConfirmItem(QtWidgets.QWidget, Ui_WidgetConfirmItem):
@@ -86,6 +127,8 @@ class ListConfirmItem(QtWidgets.QWidget, Ui_WidgetConfirmItem):
         self.btn_minus.clicked.connect(lambda state: self._stepper_add(-1))
 
     def _stepper_add(self, value):
+        if self.parent.is_refractory_period is True:
+            return
         label_counter = self.label_item_count
         int_value = int(label_counter.text())
         int_value += value
@@ -96,6 +139,7 @@ class ListConfirmItem(QtWidgets.QWidget, Ui_WidgetConfirmItem):
             self.parent.update_stepper_value_btn_minus(self.item_row_index)
         elif value == 1:
             self.parent.update_stepper_value_btn_plus(self.item_row_index)
+        self.parent.set_refractory_period()
 
     def _delete_row(self):
         self.parent.delete_basket_item(self.item_row_index)
@@ -106,6 +150,7 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         assert isinstance(menu_info, Menu)
         super().__init__()
         self.setupUi(self)
+        self.setGeometry(30, 30, 540, 960)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.parent = parent
         self.menu_info = menu_info
@@ -118,10 +163,12 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         self._config_labels()
         self._set_btn_triggered()
         self._stepper_add(self.label_item_count_1, 0)
+        self.parent.set_enable_button()
         self._stepper_add(self.label_item_count_2, 0)
         self._initialize_widget_select_area()
         self._hide_banners()
         self._showing_banners(0)
+        self.nutrition_modal = None
 
     def _reset_option_list(self):
         self._option_list = list()
@@ -202,7 +249,7 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         if self._option_list is not None:
             option = self._option_list
         quantity = int(self.label_item_count_2.text())
-        title_info = f'''{self.menu_info.name}\n￦{self.menu_info.now_price(option) * quantity:,d} {common.calories_handler(self.menu_info.get_calories())*quantity:,}kcal'''
+        title_info = f'''{self.menu_info.name}\n￦{self.menu_info.now_price(option) * quantity:,d} {common.calories_handler(self.menu_info.get_calories()) * quantity:,}kcal'''
         self.label_menu_name_header_name_1.setText(title_info)
         self.label_menu_name_header_name_2.setText(title_info)
         self.label_menu_name_header_name_3.setText(title_info)
@@ -281,6 +328,17 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         self.widget_right.mouseReleaseEvent = self.right_widget_release_event
         self.btn_add_basket_option.clicked.connect(lambda state: self._apply_quantity_and_add_item_on_basket('set'))
         self.btn_add_basket_count.clicked.connect(lambda state: self._apply_quantity_and_add_item_on_basket('single'))
+        self.btn_nutrition_set.clicked.connect(lambda state: self.make_nutrition_info_modal())
+        self.btn_nutrition_count.clicked.connect(lambda state: self.make_nutrition_info_modal())
+
+    def make_nutrition_info_modal(self):
+        if self.nutrition_modal is None:
+            self.nutrition_modal = ModalNutrition(self.parent, self, self.menu_info, self.pixmap_dict,
+                                                  self.total_menu_list)
+            self.parent.add_opened_modal(self.nutrition_modal)
+        else:
+            self.nutrition_modal.menu_info = self.menu_info
+        self.nutrition_modal.show()
 
     def _apply_quantity_and_add_item_on_basket(self, from_page):
         quantity = 0
@@ -353,6 +411,8 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         self.close()
 
     def _stepper_add(self, label_counter, value):
+        if self.parent.is_refractory_period is True:
+            return
         int_value = int(label_counter.text())
         int_value += value
         # 1과 같아지면 버튼 비활성화
@@ -384,6 +444,7 @@ class ModalOption(QtWidgets.QWidget, Ui_Modal_set_option):
         label_counter.setText(str(int_value))
         self._refresh_label_on_count_page(label_counter)
         self._refresh_title_name_label()
+        self.parent.set_refractory_period()
 
     def _refresh_label_on_count_page(self, label_counter):
         quantity = int(label_counter.text())

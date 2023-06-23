@@ -37,7 +37,7 @@ QScrollArea * {
 	background: transparent;
 }
 
-#qr_section,#qr_section_2,#qr_section_3,#qr_section_4 {
+#qr_section_1,#qr_section_2,#qr_section_3,#qr_section_4 {
 	background-color: #ffbc0d;
 }
 #frame_line_1,#frame_line_2,#frame_line_3,#frame_line_4,#frame_line_5,#frame_line_6,#frame_line_7,#frame_line_8,#frame_line_9{
@@ -48,6 +48,9 @@ QScrollArea * {
 }
 #label_banner_home{
 	font: 14px;
+}
+#label_2{
+	font:24pt;
 }
 #label_logo{
 	border-style: solid;
@@ -189,7 +192,6 @@ QPushButton:Pressed {
 }
 #widget_video_card_2{
 	border-image: url('src/receipt.svg') 0 0 0 0 stretch stretch;
-
 }	</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_59">
@@ -791,10 +793,13 @@ QPushButton:Pressed {
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;식사방법을&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;선택해주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>선택해주세요</string>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
@@ -1038,7 +1043,7 @@ QPushButton:Pressed {
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QPushButton" name="pushButton_3">
+                 <widget class="QPushButton" name="btn_lang_eng">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                     <horstretch>0</horstretch>
@@ -1051,7 +1056,7 @@ QPushButton:Pressed {
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_4">
+                 <widget class="QPushButton" name="btn_lang_kor">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                     <horstretch>0</horstretch>
@@ -2745,7 +2750,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>382</width>
+                      <width>310</width>
                       <height>818</height>
                      </rect>
                     </property>
@@ -3103,8 +3108,8 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>78</width>
-                      <height>28</height>
+                      <width>80</width>
+                      <height>30</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -3528,7 +3533,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>98</width>
+                      <width>80</width>
                       <height>600</height>
                      </rect>
                     </property>
@@ -3670,7 +3675,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>98</width>
+                      <width>80</width>
                       <height>600</height>
                      </rect>
                     </property>
@@ -4044,7 +4049,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>98</width>
+                      <width>80</width>
                       <height>600</height>
                      </rect>
                     </property>
@@ -4183,7 +4188,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>98</width>
+                      <width>80</width>
                       <height>600</height>
                      </rect>
                     </property>
@@ -4322,7 +4327,7 @@ QPushButton:Pressed {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>98</width>
+                      <width>80</width>
                       <height>600</height>
                      </rect>
                     </property>
@@ -5066,8 +5071,8 @@ QPushButton:Pressed {
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>513</width>
-                  <height>526</height>
+                  <width>100</width>
+                  <height>30</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_89">
@@ -6042,7 +6047,7 @@ QPushButton:Pressed {
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_32">
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="btn_back_pay_way">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                  <horstretch>0</horstretch>

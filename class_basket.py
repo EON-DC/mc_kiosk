@@ -1,8 +1,5 @@
-import datetime
-import sqlite3
-from common import *
-
 from class_db_connect import KioskDBConnector
+from common import *
 
 
 class Basket:
@@ -28,6 +25,7 @@ class Basket:
             residual_option = self.option_list[index][1:]
             menu_name_list.append((name, str(item_quantity) + '개', residual_option, f'{self.price_list[index]:,d}원'))
         return str(menu_name_list)
+
 
     def set_eat_way(self, eat_way):
         self.eat_way = eat_way
@@ -57,7 +55,7 @@ class Basket:
         # 들어오는 옵션의 0번째는 수량, 1번째는 세트여부, -2번째는 사이드, -1번째는 음료
         self.menu_id_list.append(menu_id)
         self.option_list.append(option)
-        now_price = self.get_price_2(menu_id, option)
+        now_price = self.get_price(menu_id, option)
         self.price_list.append(now_price)
 
     def update_qrcode(self, qr_code_id):
@@ -66,7 +64,7 @@ class Basket:
     def refresh_price_list(self):
         self.price_list = list()
         for menu_id, option in zip(self.menu_id_list, self.option_list):
-            self.price_list.append(self.get_price_2(menu_id, option))
+            self.price_list.append(self.get_price(menu_id, option))
 
     def delete_item(self, index_):
         assert isinstance(index_, int) and 0 <= index_ < len(self.menu_id_list)
@@ -92,7 +90,7 @@ class Basket:
     def get_additional_price(self, idx):
         return self.total_menu_list[idx - 1].additional_price
 
-    def get_price_2(self, menu_id, option):
+    def get_price(self, menu_id, option):
         result_price = 0
         quantity = option[0]
         menu = self.total_menu_list[menu_id - 1]

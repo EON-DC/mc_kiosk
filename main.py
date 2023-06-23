@@ -1,9 +1,10 @@
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+
+from PyQt5 import QtWidgets
 
 from class_controller import KioskController
-from class_ui_main import MainWindow
 from class_db_connect import KioskDBConnector
+from class_ui_main import MainWindow
 
 
 def main():

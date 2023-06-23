@@ -26,7 +26,10 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#widget_label_background{
+   <string notr="true">#QRCodeKeyBoard{
+	background-color: white;
+}
+#widget_label_background{
     border-width: 1px;
 	border-style: solid;
     border-color: #a3a3a3;
@@ -36,7 +39,7 @@
 	font: 22pt;
 }
 
-#title_lower{
+#title_lower, #label_code_text{
 	font: 14pt;
 }
 #label_footer{
@@ -45,6 +48,10 @@
 
 #widget_footer_scan{
 	background-color: #ffbc0d;
+}
+
+#widget_footer_scan{
+	background-img
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -64,7 +71,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget_79" native="true">
+    <widget class="QWidget" name="widget_qr_code" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_93">
       <property name="spacing">
        <number>0</number>
@@ -300,6 +307,9 @@
                  </property>
                  <property name="text">
                   <string/>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -1353,7 +1363,7 @@
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton">
+                   <widget class="QPushButton" name="btn_space">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -1378,7 +1388,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton_2">
+                   <widget class="QPushButton" name="btn_back">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -1449,7 +1459,7 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QPushButton" name="pushButton_3">
+                   <widget class="QPushButton" name="btn_close">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -1462,7 +1472,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton_4">
+                   <widget class="QPushButton" name="btn_confirm">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -1573,40 +1583,98 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>64</height>
+             <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="label_footer">
+          <widget class="QWidget" name="widget_10" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>80</height>
+             <height>200</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>80</height>
+             <height>200</height>
             </size>
            </property>
-           <property name="text">
-            <string>QR코드를스캔</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_footer">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>80</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>80</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>QR코드를스캔</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="minimumSize">
+               <size>
+                <width>160</width>
+                <height>160</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>160</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>../src/qr_sample.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
@@ -1617,7 +1685,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>64</height>
+             <height>20</height>
             </size>
            </property>
           </spacer>

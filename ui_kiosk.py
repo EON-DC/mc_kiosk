@@ -33,7 +33,7 @@ class Ui_MainWidget(object):
 "    background: transparent;\n"
 "}\n"
 "\n"
-"#qr_section,#qr_section_2,#qr_section_3,#qr_section_4 {\n"
+"#qr_section_1,#qr_section_2,#qr_section_3,#qr_section_4 {\n"
 "    background-color: #ffbc0d;\n"
 "}\n"
 "#frame_line_1,#frame_line_2,#frame_line_3,#frame_line_4,#frame_line_5,#frame_line_6,#frame_line_7,#frame_line_8,#frame_line_9{\n"
@@ -44,6 +44,9 @@ class Ui_MainWidget(object):
 "}\n"
 "#label_banner_home{\n"
 "    font: 14px;\n"
+"}\n"
+"#label_2{\n"
+"    font:24pt;\n"
 "}\n"
 "#label_logo{\n"
 "    border-style: solid;\n"
@@ -385,6 +388,7 @@ class Ui_MainWidget(object):
         self.horizontalLayout_21.setObjectName("horizontalLayout_21")
         self.label_2 = QtWidgets.QLabel(self.widget_39)
         self.label_2.setScaledContents(True)
+        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setWordWrap(True)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_21.addWidget(self.label_2)
@@ -455,22 +459,22 @@ class Ui_MainWidget(object):
         self.horizontalLayout_23.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_23.setSpacing(5)
         self.horizontalLayout_23.setObjectName("horizontalLayout_23")
-        self.pushButton_3 = QtWidgets.QPushButton(self.widget_43)
+        self.btn_lang_eng = QtWidgets.QPushButton(self.widget_43)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_3.sizePolicy().hasHeightForWidth())
-        self.pushButton_3.setSizePolicy(sizePolicy)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout_23.addWidget(self.pushButton_3)
-        self.pushButton_4 = QtWidgets.QPushButton(self.widget_43)
+        sizePolicy.setHeightForWidth(self.btn_lang_eng.sizePolicy().hasHeightForWidth())
+        self.btn_lang_eng.setSizePolicy(sizePolicy)
+        self.btn_lang_eng.setObjectName("btn_lang_eng")
+        self.horizontalLayout_23.addWidget(self.btn_lang_eng)
+        self.btn_lang_kor = QtWidgets.QPushButton(self.widget_43)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_4.sizePolicy().hasHeightForWidth())
-        self.pushButton_4.setSizePolicy(sizePolicy)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_23.addWidget(self.pushButton_4)
+        sizePolicy.setHeightForWidth(self.btn_lang_kor.sizePolicy().hasHeightForWidth())
+        self.btn_lang_kor.setSizePolicy(sizePolicy)
+        self.btn_lang_kor.setObjectName("btn_lang_kor")
+        self.horizontalLayout_23.addWidget(self.btn_lang_kor)
         self.horizontalLayout_22.addWidget(self.widget_43)
         self.verticalLayout_39.addWidget(self.widget_42)
         spacerItem12 = QtWidgets.QSpacerItem(20, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -1129,7 +1133,7 @@ class Ui_MainWidget(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 78, 28))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 62, 16))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_41 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_41.setContentsMargins(0, 0, 0, 0)
@@ -1286,7 +1290,7 @@ class Ui_MainWidget(object):
         self.scrollArea_7.setWidgetResizable(True)
         self.scrollArea_7.setObjectName("scrollArea_7")
         self.scrollAreaWidgetContents_7 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_7.setGeometry(QtCore.QRect(0, 0, 98, 600))
+        self.scrollAreaWidgetContents_7.setGeometry(QtCore.QRect(0, 0, 62, 600))
         self.scrollAreaWidgetContents_7.setObjectName("scrollAreaWidgetContents_7")
         self.verticalLayout_69 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_7)
         self.verticalLayout_69.setContentsMargins(0, 0, 0, 0)
@@ -1337,7 +1341,7 @@ class Ui_MainWidget(object):
         self.scrollArea_8.setWidgetResizable(True)
         self.scrollArea_8.setObjectName("scrollArea_8")
         self.scrollAreaWidgetContents_8 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_8.setGeometry(QtCore.QRect(0, 0, 98, 600))
+        self.scrollAreaWidgetContents_8.setGeometry(QtCore.QRect(0, 0, 62, 600))
         self.scrollAreaWidgetContents_8.setObjectName("scrollAreaWidgetContents_8")
         self.verticalLayout_74 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_8)
         self.verticalLayout_74.setContentsMargins(0, 0, 0, 0)
@@ -1483,7 +1487,7 @@ class Ui_MainWidget(object):
         self.scrollArea_10.setWidgetResizable(True)
         self.scrollArea_10.setObjectName("scrollArea_10")
         self.scrollAreaWidgetContents_10 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_10.setGeometry(QtCore.QRect(0, 0, 98, 600))
+        self.scrollAreaWidgetContents_10.setGeometry(QtCore.QRect(0, 0, 62, 600))
         self.scrollAreaWidgetContents_10.setMinimumSize(QtCore.QSize(0, 600))
         self.scrollAreaWidgetContents_10.setObjectName("scrollAreaWidgetContents_10")
         self.verticalLayout_48 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_10)
@@ -1534,7 +1538,7 @@ class Ui_MainWidget(object):
         self.scrollArea_11.setWidgetResizable(True)
         self.scrollArea_11.setObjectName("scrollArea_11")
         self.scrollAreaWidgetContents_11 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_11.setGeometry(QtCore.QRect(0, 0, 98, 600))
+        self.scrollAreaWidgetContents_11.setGeometry(QtCore.QRect(0, 0, 62, 600))
         self.scrollAreaWidgetContents_11.setMinimumSize(QtCore.QSize(0, 600))
         self.scrollAreaWidgetContents_11.setObjectName("scrollAreaWidgetContents_11")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_11)
@@ -1585,7 +1589,7 @@ class Ui_MainWidget(object):
         self.scrollArea_12.setWidgetResizable(True)
         self.scrollArea_12.setObjectName("scrollArea_12")
         self.scrollAreaWidgetContents_12 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_12.setGeometry(QtCore.QRect(0, 0, 98, 600))
+        self.scrollAreaWidgetContents_12.setGeometry(QtCore.QRect(0, 0, 62, 600))
         self.scrollAreaWidgetContents_12.setMinimumSize(QtCore.QSize(0, 600))
         self.scrollAreaWidgetContents_12.setObjectName("scrollAreaWidgetContents_12")
         self.verticalLayout_51 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_12)
@@ -2131,16 +2135,16 @@ class Ui_MainWidget(object):
         self.widget_53.setObjectName("widget_53")
         self.horizontalLayout_32 = QtWidgets.QHBoxLayout(self.widget_53)
         self.horizontalLayout_32.setObjectName("horizontalLayout_32")
-        self.pushButton_2 = QtWidgets.QPushButton(self.widget_53)
+        self.btn_back_pay_way = QtWidgets.QPushButton(self.widget_53)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_2.sizePolicy().hasHeightForWidth())
-        self.pushButton_2.setSizePolicy(sizePolicy)
-        self.pushButton_2.setMinimumSize(QtCore.QSize(160, 0))
-        self.pushButton_2.setMaximumSize(QtCore.QSize(160, 16777215))
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_32.addWidget(self.pushButton_2)
+        sizePolicy.setHeightForWidth(self.btn_back_pay_way.sizePolicy().hasHeightForWidth())
+        self.btn_back_pay_way.setSizePolicy(sizePolicy)
+        self.btn_back_pay_way.setMinimumSize(QtCore.QSize(160, 0))
+        self.btn_back_pay_way.setMaximumSize(QtCore.QSize(160, 16777215))
+        self.btn_back_pay_way.setObjectName("btn_back_pay_way")
+        self.horizontalLayout_32.addWidget(self.btn_back_pay_way)
         self.verticalLayout_53.addWidget(self.widget_53)
         spacerItem46 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_53.addItem(spacerItem46)
@@ -2456,7 +2460,7 @@ class Ui_MainWidget(object):
         self.verticalLayout_59.addWidget(self.main_stacked_widget)
 
         self.retranslateUi(MainWidget)
-        self.main_stacked_widget.setCurrentIndex(0)
+        self.main_stacked_widget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(MainWidget)
 
     def retranslateUi(self, MainWidget):
@@ -2467,7 +2471,7 @@ class Ui_MainWidget(object):
         self.btn_language_stanby.setText(_translate("MainWidget", "Language"))
         self.btn_help_stanby.setText(_translate("MainWidget", "도움 기능"))
         self.label_warning_calories.setText(_translate("MainWidget", "일반적인 영양 권장량은 2,000칼로리이지만 필요한 칼로리는 다를 수 있습니다. 요청시 추가 영양정보를 제공해드립니다."))
-        self.label_2.setText(_translate("MainWidget", "<html><head/><body><p align=\"center\"><span style=\" font-size:24pt;\">식사방법을</span></p><p align=\"center\"><span style=\" font-size:24pt;\">선택해주세요</span></p></body></html>"))
+        self.label_2.setText(_translate("MainWidget", "선택해주세요"))
         self.btn_restaurant.setText(_translate("MainWidget", "매장에서 식사\n"
 "\n"
 "\n"
@@ -2491,8 +2495,8 @@ class Ui_MainWidget(object):
 "\n"
 ""))
         self.label_3.setText(_translate("MainWidget", "언어"))
-        self.pushButton_3.setText(_translate("MainWidget", "English"))
-        self.pushButton_4.setText(_translate("MainWidget", "한국어"))
+        self.btn_lang_eng.setText(_translate("MainWidget", "English"))
+        self.btn_lang_kor.setText(_translate("MainWidget", "한국어"))
         self.label_scan_qr_code_stanby_3.setText(_translate("MainWidget", "QR코드를 스캔하세요"))
         self.btn_go_standby_2.setText(_translate("MainWidget", "처음으로"))
         self.btn_help_stanby_3.setText(_translate("MainWidget", "도움 기능"))
@@ -2556,7 +2560,7 @@ class Ui_MainWidget(object):
 "(CARD PAYMENT)"))
         self.label_11.setText(_translate("MainWidget", "모바일 상품권\n"
 "(MOBILE GIFT CARD)"))
-        self.pushButton_2.setText(_translate("MainWidget", "뒤로"))
+        self.btn_back_pay_way.setText(_translate("MainWidget", "뒤로"))
         self.btn_help_stanby_5.setText(_translate("MainWidget", "도움 기능"))
         self.btn_go_standby_4.setText(_translate("MainWidget", "처음으로"))
         self.label_warning_calories_5.setText(_translate("MainWidget", "<html><head/><body><p><span style=\" font-size:6pt;\">일반적인 영양 권장량은 2,000칼로리이지만 필요한 칼로리는 다를 수 있습니다. 요청시 추가 영양정보를 제공해드립니다.</span></p></body></html>"))

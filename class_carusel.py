@@ -1,9 +1,8 @@
-from PyQt5.QtCore import Qt
+from PyQt5 import QtWidgets
 
 from class_menu import Menu
-from ui_carusel import Ui_Carusel
-from PyQt5 import QtCore, QtGui, QtWidgets
 from class_ui_modal import ModalOption
+from ui_carusel import Ui_Carusel
 
 
 class Carusel(QtWidgets.QWidget, Ui_Carusel):
@@ -23,6 +22,7 @@ class Carusel(QtWidgets.QWidget, Ui_Carusel):
         self._set_clicked_event()
         self.option_modal = self._initialize_modal_window()
         self._set_title()
+        self._set_enable_config()
 
     def _set_title(self):
         self.label_info.hide()
@@ -33,8 +33,14 @@ class Carusel(QtWidgets.QWidget, Ui_Carusel):
             self.label_info.show()
             self.label_info.setText('해피메뉴')
 
+    def _set_enable_config(self):
+        if self.menu_info.is_enable is False:
+            self.frame_4.setStyleSheet('background-color:#e3e3e4')
+            self.setEnabled(False)
+
     def _initialize_modal_window(self):
         modal = ModalOption(self.parent, self.menu_info, self.pixmap_dict, self.total_menu_list)
+        self.parent.add_opened_modal(modal)
         return modal
 
     def _set_clicked_event(self):

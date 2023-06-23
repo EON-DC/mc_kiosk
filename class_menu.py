@@ -64,6 +64,7 @@ class Menu:
         self.level_8 = level_8
         self.allergy_info = allergy_info
         self.country_info = country_info
+        self.is_enable = True
 
     def __repr__(self):
         return f'{self.menu_id:02d}:{self.name}_객체'
@@ -73,6 +74,9 @@ class Menu:
             return ''
         else:
             return self.calory
+
+    def set_menu_disable(self):
+        self.is_enable = False
 
     def now_price(self, option):
         if is_lunch() and self.is_lunch_menu == 1:
